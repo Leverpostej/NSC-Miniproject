@@ -2,6 +2,7 @@ import pyopencl as cl
 from matplotlib import pyplot as plt
 import numpy as np
 
+# Create the context (containing platform and device information) and command queue.
 ctx = cl.create_some_context()
 devices = ctx.get_info(cl.context_info.DEVICES)
 print(devices)
@@ -12,7 +13,8 @@ def mandelbrot_gpu(input):
     queue = cl.CommandQueue(ctx)
     
     output = np.zeros(input.shape).astype(np.int32)
-
+    
+    # Source of the kernel itself.
     prg = cl.Program(ctx, """
     __kernel void mandelbrot(
         __global const float2 *input,
