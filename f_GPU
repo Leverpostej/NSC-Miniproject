@@ -2,6 +2,8 @@ import pyopencl as cl
 from matplotlib import pyplot as plt
 import numpy as np
 
+%pylab inline
+
 # Create the context (containing platform and device information) and command queue.
 ctx = cl.create_some_context()
 devices = ctx.get_info(cl.context_info.DEVICES)
@@ -63,7 +65,7 @@ def mandelbrot():
     o = mandelbrot_gpu(z)
     return (o)
 
-I = mandelbrot()
+%time I = mandelbrot()
 I = np.reshape(I,(16000,16000))
 plt.imshow(I, cmap=plt.cm.hot)  # plot the image
 plt.show()
