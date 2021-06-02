@@ -1,0 +1,5 @@
+numpy~=1.18.5
+matplotlib~=3.3.3
+setuptools~=56.0.0
+h5py~=2.10.0
+Pillow~=7.2.0
