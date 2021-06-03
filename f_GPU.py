@@ -28,7 +28,6 @@ def mandelbrot_gpu(input):
             float real2 = real*real, imag2 = imag*imag;
             if (real*real + imag*imag > 2.0f){
                  output[gid] = i;
-                 return;
             }
             imag = 2* real*imag + input[gid].y;
             real = real2 - imag2 + input[gid].x;
