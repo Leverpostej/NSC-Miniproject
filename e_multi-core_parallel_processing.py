@@ -39,5 +39,5 @@ def main(processes):
 
 
 if __name__ == '__main__':
-    workers = 8
+    workers = 4
     main(workers)
