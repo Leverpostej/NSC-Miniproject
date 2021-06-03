@@ -1,38 +1,56 @@
-import numpy as np
+from PIL import ImageDraw
+import h5py
+import time
 from PIL import Image
 from numba import jit
 
 
-PIXEL_SCALE = 200
-WIDTH = 3
-HEIGHT = 3
-XSTART = -2
-YSTART = -1.5
-
-image_width = int(PIXEL_SCALE*WIDTH)
-image_height = int(PIXEL_SCALE*HEIGHT)
-
 @jit(nopython=True)
-def calc(c1, c2):
-    x = y = 0
-    for i in range(1000):
-        x, y = x*x - y*y + c1, 2*x*y + c2
-        if x*x + y*y > 4:
-            return i+1
-    return 0
+def mandelbrot(c, threshold, max_iter=80):
+    z = 0
+    n = 0
+    while abs(z) <= threshold and n < max_iter:
+        z = z*z + c
+        n += 1
+    return n, z
 
-array = np.zeros((image_height,
-                  image_width,
-                  3),
-                 dtype=np.uint8)
 
-for i in range(image_width):
-    c1 = XSTART + i/PIXEL_SCALE
-    for j in range(image_height):
-        c2 = YSTART + j/PIXEL_SCALE
-        v = calc(c1, c2)
-        if v:
-            array[j, i,] = (255, 255, 255)
+def main():
+    max_iter = 80
+    threshold = 2
+    # Image size (pixels)
+    width = 5000
+    height = 5000
 
-img = Image.fromarray(array)
-img.save('mandelbrot.png')
+    # Plot window
+    re_start = -2
+    re_end = 1
+    im_start = -1.5
+    im_end = 1.5
+
+    im = Image.new('HSV', (width, height), (0, 0, 0))
+    draw = ImageDraw.Draw(im)
+    start = time.time()
+    z = []
+    for x in range(0, width):
+        for y in range(0, height):
+            # Convert pixel coordinate to complex number
+            c = complex(re_start + (x / width) * (re_end - re_start),
+                        im_start + (y / height) * (im_end - im_start))
+            # Compute the number of iterations
+            m, z2 = mandelbrot(c, threshold, max_iter)
+            # The color depends on the number of iterations
+            hue = int(255 * m / max_iter)
+            saturation = 255
+            value = 255 if m < max_iter else 0
+            # Plot the point
+            draw.point([x, y], (hue, saturation, value))
+            z.append(z2)
+    h5f = h5py.File('numba.h5', 'w')
+    h5f.create_dataset('dataset_1', data=z)
+    h5f.close()
+    print("computation time", time.time()-start)
+    im.convert('RGB').save('numba.png', 'PNG')
+
+
+main()

@@ -1,30 +1,43 @@
-from numpy           import linspace, reshape
-from matplotlib      import pyplot
+import h5py
+from numpy import linspace, reshape
+from matplotlib import pyplot
 from multiprocessing import Pool
+import time
 
-xmin, xmax = -2.0 ,0.5   # x range
-ymin, ymax = -1.25,1.25  # y range
-nx  , ny   =  1000,1000  # resolution
-maxiter    =  50         # max iterations
 
-def mandelbrot(z): # computation for one pixel
-  c = z
-  for n in range(maxiter):
-    if abs(z)>2: return n  # divergence test
-    z = z*z + c
-  return maxiter
+def mandelbrot(z):  # computation for one pixel
+    c = z
+    for n in range(80):
+        if abs(z) > 2:
+            return n  # divergence test
+        z = z * z + c
+    return 80
 
-X = linspace(xmin,xmax,nx) # lists of x and y
-Y = linspace(ymin,ymax,ny) # pixel co-ordinates
 
-# main loops
+def main(processes):
+    x_min, x_max = -2.0, 1  # x range
+    y_min, y_max = -1.5, 1.5  # y range
+    nx, ny = 5000, 5000  # resolution
+    start = time.time()
+
+    X = linspace(x_min, x_max, nx)  # lists of x and y
+    Y = linspace(y_min, y_max, ny)  # pixel co-ordinates
+
+    p = Pool(processes=processes)
+    z = [complex(x, y) for y in Y for x in X]
+    n = p.map(mandelbrot, z)
+    print("computation time", time.time()-start)
+
+    n = reshape(n, (nx, ny))  # change to rectangular array
+
+    pyplot.imshow(n)  # plot the image
+    # pyplot.show()
+    pyplot.savefig('parallel.png')
+    h5f = h5py.File('parallel.h5', 'w')
+    h5f.create_dataset('dataset_1', data=z)
+    h5f.close()
+
+
 if __name__ == '__main__':
-
-    p = Pool()
-    Z = [complex(x,y) for y in Y for x in X]
-    N = p.map(mandelbrot,Z)
-
-    N = reshape(N, (nx,ny)) # change to rectangular array
-
-    pyplot.imshow(N) # plot the image
-    pyplot.show()
+    workers = 8
+    main(workers)

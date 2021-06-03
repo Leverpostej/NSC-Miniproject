@@ -16,14 +16,14 @@ def main():
     max_iter = 80
     threshold = 2
     # Image size (pixels)
-    width = 600
-    height = 400
+    width = 5000
+    height = 5000
 
     # Plot window
     re_start = -2
     re_end = 1
-    im_start = -1
-    im_end = 1
+    im_start = -1.5
+    im_end = 1.5
 
     im = Image.new('HSV', (width, height), (0, 0, 0))
     draw = ImageDraw.Draw(im)
@@ -47,7 +47,7 @@ def main():
     h5f.create_dataset('dataset_1', data=z)
     h5f.close()
     print("computation time", time.time()-start)
-    im.convert('RGB').save('output.png', 'PNG')
+    im.convert('RGB').save('naive.png', 'PNG')
 
 
 main()

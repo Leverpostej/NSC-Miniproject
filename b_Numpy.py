@@ -17,7 +17,7 @@ def mandelbrot_set(c, threshold, num_iterations):
 
 
 def main():
-    num_iterations = 500
+    num_iterations = 80
     threshold = 2
     start = time.time()
     x, y = np.ogrid[-2:1:5000j, -1.5:1.5:5000j]
@@ -26,7 +26,7 @@ def main():
     print("computation time", time.time()-start)
     plt.imshow(n.T, extent=[-2, 1, -1.5, 1.5], cmap=plt.cm.get_cmap("hot"), aspect='auto')
 
-    plt.show()
+    # plt.show()
     plt.savefig('numpy.png')
     h5f = h5py.File('numpy.h5', 'w')
     h5f.create_dataset('dataset_1', data=z)
